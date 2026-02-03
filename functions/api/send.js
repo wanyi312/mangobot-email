@@ -3,6 +3,10 @@ import { Resend } from 'resend';
 
 export async function onRequestPost({ request, env }) {
   try {
+    return new Response(JSON.stringify({
+        message: "正在检查环境变量...",
+        available_keys: Object.keys(env) 
+    }));
     // 从请求中解析 JSON 数据
     const { to, subject, html, text } = await request.json();
 
