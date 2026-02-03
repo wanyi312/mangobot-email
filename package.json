@@ -1,0 +1,15 @@
+{
+  "name": "mangobot-email",
+  "version": "1.0.0",
+  "description": "Email sending service using Node.js, Resend, and Cloudflare Pages",
+  "scripts": {
+    "dev": "wrangler pages dev",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "resend": "^3.0.0"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}
