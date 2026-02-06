@@ -1,6 +1,19 @@
 // 导入 Resend SDK
 import { Resend } from 'resend';
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+};
+
+export const onRequestOptions = async () => {
+  return new Response(null, {
+    status: 204,
+    headers: corsHeaders
+  });
+};
+
 export async function onRequestPost({ request, env }) {
   try {
     // 从请求中解析 JSON 数据
@@ -10,7 +23,10 @@ export async function onRequestPost({ request, env }) {
     if (!to || !subject || (!html && !text)) {
       return new Response(JSON.stringify({ error: 'Missing required fields: to, subject, and html/text' }), {
         status: 400,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          ...corsHeaders,
+          'Content-Type': 'application/json' 
+        },
       });
     }
 
@@ -18,7 +34,10 @@ export async function onRequestPost({ request, env }) {
     if (!env.RESEND_API_KEY) {
       return new Response(JSON.stringify({ error: 'RESEND_API_KEY is not configured in environment variables' }), {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          ...corsHeaders,
+          'Content-Type': 'application/json' 
+        },
       });
     }
 
@@ -41,19 +60,28 @@ export async function onRequestPost({ request, env }) {
     if (error) {
       return new Response(JSON.stringify({ error: error }), {
         status: 400,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          ...corsHeaders,
+          'Content-Type': 'application/json' 
+        },
       });
     }
 
     return new Response(JSON.stringify({ message: 'Email sent successfully', id: data.id }), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        ...corsHeaders,
+        'Content-Type': 'application/json' 
+      },
     });
 
   } catch (err) {
     return new Response(JSON.stringify({ error: 'Internal Server Error', details: err.message }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        ...corsHeaders,
+        'Content-Type': 'application/json' 
+      },
     });
   }
 }
