@@ -88,10 +88,19 @@ export default {
     );
 
     const results = await Promise.allSettled(sendPromises);
+
+    // 详细日志
+    results.forEach((result, index) => {
+      if (result.status === 'fulfilled') {
+        console.log(`✓ Sent to ${subscribers[index]}, ID: ${result.value.data?.id}`);
+      } else {
+        console.log(`✗ Failed to ${subscribers[index]}: ${result.reason?.message || result.reason}`);
+      }
+    });
+
     const succeeded = results.filter(r => r.status === 'fulfilled').length;
     const failed = results.filter(r => r.status === 'rejected').length;
-
-    console.log(`Forwarded to ${succeeded} subscribers, ${failed} failed`);
+    console.log(`Summary: ${succeeded} succeeded, ${failed} failed`);
 
     // 8. 标记为已处理
     if (env.PROCESSED_EMAILS) {
