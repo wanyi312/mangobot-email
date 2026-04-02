@@ -1,3 +1,30 @@
 name = "mangobot-email"
+main = "src/index.js"
 compatibility_date = "2024-09-23"
-pages_build_output_dir = "public"
+
+[vars]
+FILTER_SENDER = "wy776723419@gmail.com"
+FILTER_SUBJECT_PREFIX = "mangobot最新"
+
+# KV 命名空间（需要先创建）
+# wrangler kv:namespace create PROCESSED_EMAILS
+# wrangler kv:namespace create SUBSCRIBERS
+[[kv_namespaces]]
+binding = "PROCESSED_EMAILS"
+id = "8681aee96890462e87912a2b951cb0cf"
+# preview_id = "your-processed-emails-preview-kv-id"
+
+[[kv_namespaces]]
+binding = "SUBSCRIBERS"
+id = "0857204dbed449a99f44171f7c71516f"
+# preview_id = "your-subscribers-preview-kv-id"
+
+# Email Routing 配置
+# 需要在 Cloudflare Dashboard 中配置 Email Routing
+# 然后在 Email Workers 中绑定到这个 Worker
+[email]
+name = "mangobot-email"
+
+# 静态资源（可选，如果需要托管前端页面）
+[site]
+bucket = "./public"
