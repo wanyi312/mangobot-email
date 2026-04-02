@@ -1,20 +1,9 @@
 import { Resend } from 'resend';
+import { corsHeaders, jsonResponse } from './utils.js';
+import { readSubscribers } from './subscribers.js';
 import { handleSubscribe } from './handlers/subscribe.js';
 import { handleCancel } from './handlers/cancel.js';
 import { handleSend } from './handlers/send.js';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': '*',
-};
-
-function jsonResponse(data, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-  });
-}
 
 export default {
   // HTTP 请求处理
@@ -51,7 +40,6 @@ export default {
 
     // 1. 过滤发件人
     if (message.from !== filterSender) {
-      // 不匹配的邮件，直接丢弃（或可转发到备用邮箱）
       console.log(`Ignored email from ${message.from}, expected ${filterSender}`);
       return;
     }
@@ -131,7 +119,6 @@ function parseEmail(rawEmail) {
   const subjectMatch = headerPart.match(/^Subject:\s*(.+(?:\r?\n[ \t]+.+)*)/mi);
   if (subjectMatch) {
     subject = subjectMatch[1].replace(/\r?\n[ \t]+/g, ' ').trim();
-    // 解码 MIME encoded-word (=?UTF-8?B?...?= 或 =?UTF-8?Q?...?=)
     subject = decodeMimeWords(subject);
   }
 
@@ -154,7 +141,6 @@ function parseEmail(rawEmail) {
       const partHeader = part.substring(0, partHeaderEnd);
       let partBody = part.substring(partHeaderEnd + 4).trim();
 
-      // 检查 Content-Transfer-Encoding
       const encodingMatch = partHeader.match(/Content-Transfer-Encoding:\s*(\S+)/i);
       const encoding = encodingMatch ? encodingMatch[1].toLowerCase() : '7bit';
 
@@ -202,15 +188,4 @@ function decodeQuotedPrintable(str) {
   return str
     .replace(/=\r?\n/g, '')
     .replace(/=([0-9A-Fa-f]{2})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
-}
-
-/**
- * 读取订阅者列表
- */
-async function readSubscribers(env) {
-  if (env.SUBSCRIBERS) {
-    const data = await env.SUBSCRIBERS.get('list');
-    return data ? JSON.parse(data) : [];
-  }
-  return [];
 }
