@@ -90,19 +90,27 @@ export default {
     const results = await Promise.allSettled(sendPromises);
 
     // 详细日志
+    let succeeded = 0;
+    let failed = 0;
+
     results.forEach((result, index) => {
       if (result.status === 'fulfilled') {
         const response = result.value;
-        const emailId = response?.data?.id || response?.id || 'unknown';
-        console.log(`✓ Sent to ${subscribers[index]}, ID: ${emailId}`);
-        console.log(`  Full response:`, JSON.stringify(response));
+        // 检查是否有错误（Resend 返回 {data: null, error: {...}}）
+        if (response?.error) {
+          console.log(`✗ Failed to ${subscribers[index]}: ${response.error.message}`);
+          failed++;
+        } else {
+          const emailId = response?.data?.id || response?.id || 'unknown';
+          console.log(`✓ Sent to ${subscribers[index]}, ID: ${emailId}`);
+          succeeded++;
+        }
       } else {
         console.log(`✗ Failed to ${subscribers[index]}: ${result.reason?.message || result.reason}`);
+        failed++;
       }
     });
 
-    const succeeded = results.filter(r => r.status === 'fulfilled').length;
-    const failed = results.filter(r => r.status === 'rejected').length;
     console.log(`Summary: ${succeeded} succeeded, ${failed} failed`);
 
     // 8. 标记为已处理
