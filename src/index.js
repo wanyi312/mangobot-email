@@ -92,7 +92,10 @@ export default {
     // 详细日志
     results.forEach((result, index) => {
       if (result.status === 'fulfilled') {
-        console.log(`✓ Sent to ${subscribers[index]}, ID: ${result.value.data?.id}`);
+        const response = result.value;
+        const emailId = response?.data?.id || response?.id || 'unknown';
+        console.log(`✓ Sent to ${subscribers[index]}, ID: ${emailId}`);
+        console.log(`  Full response:`, JSON.stringify(response));
       } else {
         console.log(`✗ Failed to ${subscribers[index]}: ${result.reason?.message || result.reason}`);
       }
