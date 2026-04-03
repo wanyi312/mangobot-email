@@ -3,7 +3,7 @@ main = "src/index.js"
 compatibility_date = "2024-09-23"
 
 [vars]
-FILTER_SENDER = "changekuan@gmail.com"
+FILTER_SENDER = "wy776723419@gmail.com"
 FILTER_SUBJECT_PREFIX = "mangobot"
 
 # KV 命名空间
