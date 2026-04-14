@@ -6,6 +6,7 @@ compatibility_date = "2024-09-23"
 FILTER_SENDER = "changekuan@gmail.com"
 FILTER_SUBJECT_PREFIX = "mangobot"
 SENDER_EMAIL = "noreply@email.mangobot.org"
+FORWARD_SENDER_EMAIL = "noreply@email.mangobot.org"
 
 # KV 命名空间
 [[kv_namespaces]]

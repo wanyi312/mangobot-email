@@ -74,18 +74,22 @@ export default {
     }
 
     // 7. 通过 Resend 转发给所有订阅者
-    const resend = new Resend(env.RESEND_API_KEY);
-    const from = env.SENDER_EMAIL || 'onboarding@resend.dev';
+    const forwardApiKey = env.FORWARD_RESEND_API_KEY || env.RESEND_API_KEY;
+    const resend = new Resend(forwardApiKey);
+    const from = env.FORWARD_SENDER_EMAIL || env.SENDER_EMAIL || 'onboarding@resend.dev';
 
-    const sendPromises = subscribers.map(subscriber =>
-      resend.emails.send({
+    const placeholder = 'user@mangobot.com';
+    const sendPromises = subscribers.map(subscriber => {
+      const personalizedHtml = html ? html.replaceAll(placeholder, subscriber) : undefined;
+      const personalizedText = text ? text.replaceAll(placeholder, subscriber) : undefined;
+      return resend.emails.send({
         from,
         to: subscriber,
         subject: subject,
-        html: html || undefined,
-        text: text || undefined,
-      })
-    );
+        html: personalizedHtml,
+        text: personalizedText,
+      });
+    });
 
     const results = await Promise.allSettled(sendPromises);
 

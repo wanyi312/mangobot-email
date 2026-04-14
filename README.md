@@ -33,8 +33,10 @@ cp .dev.vars.example .dev.vars
 
 需要配置的环境变量：
 
-- `RESEND_API_KEY` - Resend API 密钥
-- `SENDER_EMAIL` - 发件人邮箱（可选，默认为 `onboarding@resend.dev`）
+- `RESEND_API_KEY` - `/api/send` 接口使用的 Resend API 密钥
+- `SENDER_EMAIL` - `/api/send` 接口使用的发件人邮箱（可选，默认为 `onboarding@resend.dev`）
+- `FORWARD_RESEND_API_KEY` - 订阅转发使用的 Resend API 密钥（可选，默认回退到 `RESEND_API_KEY`）
+- `FORWARD_SENDER_EMAIL` - 订阅转发邮件使用的发件人邮箱（可选，默认回退到 `SENDER_EMAIL`）
 
 ### 3. 创建 KV 命名空间
 
