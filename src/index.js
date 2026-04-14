@@ -14,14 +14,16 @@ export default {
 
     const url = new URL(request.url);
 
+    if (url.pathname === '/api/cancel') {
+      return handleCancel(request, env);
+    }
+
     if (request.method === 'POST') {
       switch (url.pathname) {
         case '/api/send':
           return handleSend(request, env);
         case '/api/subscribe':
           return handleSubscribe(request, env);
-        case '/api/cancel':
-          return handleCancel(request, env);
       }
     }
 

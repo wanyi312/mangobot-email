@@ -3,7 +3,8 @@ import { readSubscribers, writeSubscribers } from '../subscribers.js';
 
 export async function handleCancel(request, env) {
   try {
-    const { email } = await request.json();
+    const url = new URL(request.url);
+    const email = url.searchParams.get('email');
 
     if (!email || !isValidEmail(email)) {
       return jsonResponse({ message: 'Invalid email format' }, 400);

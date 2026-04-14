@@ -112,13 +112,16 @@ npm run dev
 
 ### 3. 取消订阅
 
-**端点:** `POST /api/cancel`
+**端点:** `GET /api/cancel`
 
-**请求体:**
-```json
-{
-  "email": "user@example.com"
-}
+**参数:**
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| email | string | 要取消订阅的邮箱地址 |
+
+**示例:**
+```
+GET /api/cancel?email=user@example.com
 ```
 
 **响应:**
