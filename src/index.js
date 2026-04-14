@@ -81,43 +81,35 @@ export default {
     const from = env.FORWARD_SENDER_EMAIL || env.SENDER_EMAIL || 'onboarding@resend.dev';
 
     const placeholder = 'user@mangobot.com';
-    const sendPromises = subscribers.map(subscriber => {
+    const emailBatch = subscribers.map(subscriber => {
       const personalizedHtml = html ? html.replaceAll(placeholder, subscriber) : undefined;
       const personalizedText = text ? text.replaceAll(placeholder, subscriber) : undefined;
-      return resend.emails.send({
+      return {
         from,
         to: subscriber,
         subject: subject,
         html: personalizedHtml,
         text: personalizedText,
-      });
+      };
     });
 
-    const results = await Promise.allSettled(sendPromises);
+    // 使用 batch API 一次性发送所有邮件，避免并发速率限制
+    const { data: batchData, error: batchError } = await resend.batch.send(emailBatch);
 
-    // 详细日志
-    let succeeded = 0;
-    let failed = 0;
-
-    results.forEach((result, index) => {
-      if (result.status === 'fulfilled') {
-        const response = result.value;
-        // 检查是否有错误（Resend 返回 {data: null, error: {...}}）
-        if (response?.error) {
-          console.log(`✗ Failed to ${subscribers[index]}: ${response.error.message}`);
-          failed++;
+    if (batchError) {
+      console.log(`✗ Batch send failed: ${batchError.message}`);
+    } else {
+      const results = batchData?.data || [];
+      results.forEach((result, index) => {
+        const target = subscribers[index] || 'unknown';
+        if (result?.id) {
+          console.log(`✓ Sent to ${target}, ID: ${result.id}`);
         } else {
-          const emailId = response?.data?.id || response?.id || 'unknown';
-          console.log(`✓ Sent to ${subscribers[index]}, ID: ${emailId}`);
-          succeeded++;
+          console.log(`✗ Failed to ${target}: no id returned`);
         }
-      } else {
-        console.log(`✗ Failed to ${subscribers[index]}: ${result.reason?.message || result.reason}`);
-        failed++;
-      }
-    });
-
-    console.log(`Summary: ${succeeded} succeeded, ${failed} failed`);
+      });
+      console.log(`Summary: batch sent ${results.length}/${subscribers.length} emails`);
+    }
 
     // 8. 标记为已处理
     if (env.PROCESSED_EMAILS) {
